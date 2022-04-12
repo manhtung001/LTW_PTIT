@@ -11,12 +11,10 @@ import { Link } from 'react-router-dom'
 import { searchItem, userSignOut } from '../../action'
 import { checkCart } from '../../action/cart'
 import cartApi from '../../api/cartApi'
-import categoryApi from '../../api/categoryApi'
 import ModalSearch from './ModalSearch/modalSearch'
 import './style.css'
 
 const Header = () => {
-    const [category, setCategory] = useState([])
     const [cart, setCart] = useState()
     const [menu, setMenu] = useState("menu__mobile__content")
     const [sub, setSub] = useState(-1)
@@ -34,15 +32,6 @@ const Header = () => {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        async function getCategoryHome() {
-            try {
-                const res = await categoryApi.getCategory()
-                setCategory(res.categories)
-            } catch (err) {
-                console.log(err);
-            }
-        }
-        getCategoryHome()
         async function renderCart() {
             try {
                 const res = await cartApi.getCart()
@@ -55,69 +44,7 @@ const Header = () => {
         renderCart()
     }, [quantityProduct, useSelect])
 
-    const showCategoryItem = (children) => {
-        let nameChildren = null
-        nameChildren = children.map((item, index) => {
-            return (
-                <li key={index} className="dropdown__item">
-                    <Link className={checkSub === item ? "dropdown__item--link color" : "dropdown__item--link"} onClick={() => onCheck(setCheckSub, item)} to={`/menu-list/${item.slug}`}>{item.name}</Link>
-                </li>
-            )
-        })
-        return nameChildren
-    }
-    const showCategory = (categories) => {
-        let result = null
-        if (categories) {
-            result = categories.map((value, index) => {
-                return (
-                    <li key={index} className="header__menu__list">
-                        <Link to={`/menu-list/${value.slug}`}>{value.name} <DownOutlined className="list--icon" /></Link>
-                        <ul className="dropdown">
-                            {showCategoryItem(value.children)}
-                        </ul>
-                    </li>
-                )
-            })
-        }
-        return result
-    }
-    const menuMobile = (categories) => {
-        let result = null
-        if (categories) {
-            result = categories.map((value, index) => {
-                return (
-                    <div key={index} className="menu__mobile__list">
-                        <ul className="mobile__list">
-                            <li className="sub__menu">
-                                <div className="mobile__item">
-                                    <Link className={checkSub === value ? "sub--icon color" : "sub--icon"} onClick={() => onCheck(setCheckSub, value)} to={`/menu-list/${value.slug}`}>{value.name} </Link>
-                                    <CaretDownFilled onClick={() => onSubMenu(index, setSub)} className={sub === index ? "sub--icon color" : "sub--icon"} />
-                                </div>
-                                <ul className={sub === index ? "dropdown__sub action" : "dropdown__sub"}>
-                                    {showCategoryItem(value.children)}
-                                </ul>
-                            </li>
-                        </ul>
-                    </div>
-                )
-            })
-        }
-        return result
-    }
 
-    const onCheck = (setCheckSub, value) => {
-        setCheckSub(value)
-        setMenu("menu__mobile__content")
-    }
-    const onSubMenu = (index, setSub) => {
-        if (index !== sub) {
-            setSub(index)
-        }
-        else {
-            setSub(-1)
-        }
-    }
     const onMenu = (setMenu) => {
         setMenu("menu__mobile__content active")
     }
@@ -189,7 +116,6 @@ const Header = () => {
                         </div>
                         <div className="header__mid__right">
                             <ul className="header__menu">
-                                {showCategory(category)}
                             </ul>
                             <div className="search__product">
                                 <SearchOutlined className="icon--search" onClick={() => onSeacrch()} />
@@ -229,7 +155,6 @@ const Header = () => {
                                             </div>
                                         </div>
                                     }
-                                    {menuMobile(category)}
                                 </div>
                             </div>
                         </div>

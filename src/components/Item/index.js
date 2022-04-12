@@ -18,26 +18,28 @@ const onDetailProduct = (id, dispatch, product) => {
     dispatch(action)
 }
 
-const showProduct = (products, dispatch) => {
+const showProduct = (products, dispatch, isAll) => {
     let result = null
-    result = products.map((value, index) => {
-        let money = Number(value.price);
-        money = money.toLocaleString('vi', { style: 'currency', currency: 'VND' })
+    if (typeof products !== 'undefined') {
+        result = products.map((value, index) => {
+            let money = Number(value.price);
+            money = money.toLocaleString('vi', { style: 'currency', currency: 'VND' })
 
-        return (
-            <Link onClick={() => onDetailProduct(value._id, dispatch, products)} to={`/products/${value.slug}`} key={index} className="col-xl-3 col-sm-6 col-md-4 product__items">
-                <div className="product__content">
-                    <div className="product__content__img">
-                        <img className="img--before" src={value.productImage[0].img} alt="" />
-                        <img className="img--after" src={value.productImage[1].img} alt="" />
+            return (
+                <Link onClick={() => onDetailProduct(value._id, dispatch, products)} to={`/products/${value.slug}`} key={index} className={isAll ? "col-xl-3 col-sm-6 col-md-4 product__items" : "product__items"} >
+                    <div className="product__content">
+                        <div className="product__content__img">
+                            <img className="img--before" src={value.productImage[0].img} alt="" />
+                            <img className="img--after" src={value.productImage[1].img} alt="" />
+                        </div>
+                        <div className="product__img--title">Giảm {value.sale}%</div>
                     </div>
-                    <div className="product__img--title">Giảm {value.sale}%</div>
-                </div>
-                <Link onClick={() => onDetailProduct(value._id, dispatch, products)} to={`/products/${value.slug}`} className="product__item__title">{value.title}</Link>
-                <p className="product__item__price">{money}</p>
-            </Link>
-        )
-    })
+                    <Link onClick={() => onDetailProduct(value._id, dispatch, products)} to={`/products/${value.slug}`} className="product__item__title">{value.title}</Link>
+                    <p className="product__item__price">{money}</p>
+                </Link>
+            )
+        })
+    }
     return result
 }
 

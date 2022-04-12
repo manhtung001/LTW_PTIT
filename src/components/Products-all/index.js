@@ -33,7 +33,7 @@ const ProductAll = () => {
                     <h1 className="product__new--title">Tất cả sản phẩm</h1>
                 </div>
                 <div className="row">
-                    {showProduct(product, dispatch)}
+                    {showProduct(product, dispatch, true)}
                 </div>
             </div>
         </div>

@@ -7,6 +7,7 @@ import MenuList from '../pages/MenuList'
 import Cart from '../pages/Cart'
 import CheckOut from '../pages/CheckOut'
 import HistoryProduct from '../pages/HistoryProduct'
+import ShowAllAndFilter from '../pages/ShowAllAndFilter'
 
 const router = [
     {
@@ -28,6 +29,11 @@ const router = [
         path: "/products/:name",
         exact: false,
         main: () => <DetailProduct/>
+    },
+    {
+        path: "/all-products",
+        exact: false,
+        main: () => <ShowAllAndFilter/>
     },
     {
         path: "/san-pham/:name",

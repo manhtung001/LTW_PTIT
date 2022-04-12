@@ -9,6 +9,7 @@ import { ShoppingCartOutlined, SearchOutlined, ReloadOutlined, HeartOutlined, St
 import { ProductData } from '../../action'
 import {useDispatch} from 'react-redux'
 import LoadingProduct from '../Loading/lodingProduct'
+import showProduct from '../Item'
 
 const ProductNew = () => {
     const [product, setProduct] = useState([])
@@ -29,51 +30,6 @@ const ProductNew = () => {
         renderProduct()
     }, [])
 
-    const onDetailProduct = (id) => {
-        let result = null
-        product.forEach((value) => {
-            if (id === value._id) {
-                result = value
-            }
-        })
-        const action = ProductData(result)
-        dispatch(action)
-            window.scrollTo(0, 0)
-    }   
-    const showProduct = (saleProducts) => {
-        let result = null
-        result = saleProducts.map((value, index) => {
-            let money = Number(value.price);
-            money = money.toLocaleString('vi', { style: 'currency', currency: 'VND' })
-            return (
-                <div key={index} className="product__items">
-                    <div className="product__item__img">
-                        <div className="product__content__img">
-                            <img className="img--before" src={value.productImage[0].img} alt="" />
-                            <img className="img--after" src={value.productImage[1].img} alt="" />
-                        </div>
-                        <div className="product__img--title">Giảm {value.sale}%</div>
-                        <ul className="product__button">
-                            <li className="product__button--list"><ShoppingCartOutlined /></li>
-                            <Link onClick={() => onDetailProduct(value._id)} to={`/products/${value.slug}`} className="product__button--list"><SearchOutlined /></Link>
-                            <li className="product__button--list"><ReloadOutlined /></li>
-                        </ul>
-                    </div>
-                        {/* to={`/products/${value.slug}`} tu fontend dinh nghia, 0 lq backend */}
-                    <Link onClick={() => onDetailProduct(value._id)} to={`/products/${value.slug}`} className="product__item__title">{value.title}</Link>
-                    <div className="product__item__rating">
-                        <StarFilled className="rating--th1" />
-                        <StarFilled className="rating--th2" />
-                        <StarFilled className="rating--th3" />
-                        <StarFilled className="rating--th4" />
-                        <StarFilled className="rating--th5" />
-                    </div>
-                    <p className="product__item__price">{money}</p>
-                </div>
-            )
-        })
-        return result
-    }
 
     const settings = {
         dots: true,
@@ -112,7 +68,7 @@ const ProductNew = () => {
                 </div>
                 <div className="product__sale__content">
                     <Slider autoplay {...settings}>
-                        {load ? <LoadingProduct /> : showProduct(product)}
+                        {load ? <LoadingProduct /> : showProduct(product, dispatch, false)}
                     </Slider>
                 </div>
             </div>
