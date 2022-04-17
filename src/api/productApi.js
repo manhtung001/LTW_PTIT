@@ -2349,19 +2349,24 @@ const productApi = {
         return res1
     },
     getProductBySlug: (slug,filter)=>{
-        const url = `/products/${slug}/?${filter.sort}&minPrice=${filter.min}&maxPrice=${filter.max}&page=${filter.page}&limit=${8}`
-        console.log("getProductBySlug")
-        return axiosClient.get(url)
+      //   const url = `/products/${slug}/?${filter.sort}&minPrice=${filter.min}&maxPrice=${filter.max}&page=${filter.page}&limit=${8}`
+      //   console.log("getProductBySlug")
+      //   return axiosClient.get(url)
+      return null
     },
     getSlug: (slug)=>{
-        const url = `/products/${slug}`
-        console.log("getSlug")
-        return axiosClient.get(url)
+      //   const url = `/products/${slug}`
+      //   console.log("getSlug")
+      //   return axiosClient.get(url)
+      return null
+
     },
     getProductSearch: (value) =>{
-        const url = `/products/?search=${value}`
-        console.log("getProductSearch")
-        return axiosClient.get(url)
+      //   const url = `/products/?search=${value}`
+      //   console.log("getProductSearch")
+      //   return axiosClient.get(url)\
+      return null
+
     }
 }
 export default productApi

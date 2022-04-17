@@ -9,15 +9,15 @@ import LoadingProduct from '../../components/Loading/lodingProduct'
 import './style.css'
 
 const ShowAllAndFilter = (props) => {
-    let nameURL = props.match.match.params.name
+    // let nameURL = props.match.match.params.name
     const dispatch = useDispatch()
     const [slug, setSlug] = useState()
+    const [totalProduct, setTotalProduct] = useState([])
     const [err, setErr] = useState()
     const [saleSearch, setSaleSearch] = useState({
         saleFirst: (0).toLocaleString('vi', { style: 'currency', currency: 'VND' }),
         saleLast: (10000000).toLocaleString('vi', { style: 'currency', currency: 'VND' })
     })
-    const [page, setPage] = useState(0)
     const [loadWeb, setLoadWeb] = useState(false)
     const [filter, setfilter] = useState({
         slug: '',
@@ -29,23 +29,37 @@ const ShowAllAndFilter = (props) => {
     useEffect(() => {
         setLoadWeb(true)
         window.scrollTo(0, 0)
-        async function renderProductSlug() {
+        async function renderProduct() {
             try {
-                const pageRes = await productApi.getSlug(nameURL)
-                setPage(pageRes.result)
-                setErr(null)
-                const res = await productApi.getProductBySlug(nameURL, filter)
-
+                const res = await productApi.getProduct()
                 setLoadWeb(false)
-                setSlug(res)
-            }
-            catch (err) {
+                let result = res.saleProducts.concat(res.newProducts)
+                setTotalProduct(result)
+                setSlug(result.slice(0, 10))
+            } catch (err) {
                 setLoadWeb(false)
-                setErr(err)
+                console.log(err);
             }
         }
-        renderProductSlug()
-    }, [nameURL, filter])
+        renderProduct()
+    }, [])
+    useEffect(() => {
+        setLoadWeb(true)
+        window.scrollTo(0, 0)
+        async function filterProduct() {
+            try {
+
+                setSlug(totalProduct.slice((filter.page-1) * 10, filter.page * 10))
+            } catch (err) {
+                console.log(err);
+            }
+            setLoadWeb(false)
+        }
+
+
+       
+        filterProduct()
+    }, [filter])
 
     const [flag, setFlag] = useState(true)
 
@@ -76,7 +90,7 @@ const ShowAllAndFilter = (props) => {
     const onDetailProduct = (id) => {
         let result = null
         if (slug) {
-            slug.products.forEach((value) => {
+            slug.forEach((value) => {
                 if (id === value._id) {
                     result = value
                 }
@@ -128,13 +142,15 @@ const ShowAllAndFilter = (props) => {
     const onMenu = (setFlag, flag) => {
         setFlag(!flag)
     }
-    function onChange(newPage) {
+    function onChangePage(newPage) {
         setfilter({
             ...filter,
             page: newPage
         })
     }
 
+
+    
     return (
         <div className="shop">
 
@@ -150,7 +166,7 @@ const ShowAllAndFilter = (props) => {
                             </select>
                         </div>
                         <div className="filter__right">
-                            {slug && !slug.message ? <p>Hiển thị tất cả {slug.products.length} kết quả</p> : <p>không có kết quả</p>}
+                            {slug ? <p>Hiển thị {slug.length} trên tổng số {totalProduct.length} kết quả</p> : <p>không có kết quả</p>}
                             <div onClick={() => onMenu(setFlag, flag)} className="filter__search">
                                 <span>tìm kiếm</span>
                                 <MenuOutlined />
@@ -191,11 +207,11 @@ const ShowAllAndFilter = (props) => {
                     </div>
                 </div>
 
-                {slug && slug.status && !err ?
+                {slug && !err ?
                     <div className="all__product">
                         <div className="row">
                             {loadWeb ? <LoadingProduct /> :
-                                showProductSlug(slug.products)
+                                showProductSlug(slug)
                             }
                         </div>
                     </div>
@@ -211,7 +227,10 @@ const ShowAllAndFilter = (props) => {
 
                 }
                 <Pagination
-                    defaultCurrent={1} total={page} current={filter.page} onChange={onChange}
+                    defaultCurrent={1} 
+                    total={totalProduct.length} 
+                    current={filter.page}
+                     onChange={onChangePage}
                 />
             </div>
         </div>
