@@ -1,11 +1,22 @@
 const initalCart = {
     cartProduct:false,
     cartTotal: JSON.parse(localStorage.getItem("cart")) || null,
-    checkCart: JSON.parse(localStorage.getItem("check")) 
+    checkCart: JSON.parse(localStorage.getItem("check")),
+    cartProductList: []
 }
 
 const cartReducer = (state = initalCart, action) => {
     switch(action.type){
+        case "ADDITEMTOCART":{
+            let cartProductListTmp = state.cartProductList
+            console.log("ADDITEMTOCART")
+            console.log(cartProductListTmp)
+            console.log(action.payload)
+            return {
+                ...state,
+                cartProductList: action.payload
+            }
+        }
         case "QUATITY":{
             let quantityProduct = state.cartProduct
             return{

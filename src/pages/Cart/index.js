@@ -20,6 +20,7 @@ const Cart = () => {
     const [change, setChange] = useState(false)
     const dispatch = useDispatch()
     const useSelect = useSelector(state => state.user.list)
+    const cartList = useSelector(state => state.cart.cartProductList)
 
     // const orderProduct = useSelector(state => state.order.orderAction)
     const cartRefresh = useSelector(state => state.cart.checkCart)
@@ -44,6 +45,8 @@ const Cart = () => {
             }
         }
         renderCart()
+        console.log("page cart")
+        console.log(cartList)
     }, [change])
 
     const onDelete = (idProduct) => {

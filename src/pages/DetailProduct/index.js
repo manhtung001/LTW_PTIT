@@ -3,7 +3,8 @@ import { message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, withRouter } from 'react-router-dom';
-import { imgProductData, updateQuantityCart } from '../../action';
+import { imgProductData } from '../../action';
+import { addItemToCart } from '../../action/cart';
 import { checkCart } from '../../action/cart';
 import cartApi from '../../api/cartApi';
 import LoadingButton from '../../components/Loading/loadingButton'
@@ -15,6 +16,7 @@ const DetailProduct = () => {
 
    const productData = useSelector(state => state.product.listProduct)
    const imgProduct = useSelector(state => state.product.imgProduct)
+   const cartList = useSelector(state => state.cart.cartProductList)
    const dispatch = useDispatch()
 
    const [sizeCategory, setSizeCategory] = useState()
@@ -54,32 +56,61 @@ const DetailProduct = () => {
       dispatch(action)
    }
 
-   const onBuy = (item, size) => {
+   const onBuy = (itemAdd, sizeAdd) => {
 
       const idUser = JSON.parse((localStorage.getItem("task")))
       if (idUser) {
          setLoading(false)
-         async function buyProduct() {
-            try {
-               const res = await cartApi.postCart(idUser._id, item._id, 1, size)
-               message.success("Mua hàng thành công !")
-               setLoading(true)
+         if (sizeAdd) {
+            console.log("onBuy")
+            console.log(itemAdd)
+            console.log(sizeAdd)
 
-               const action = updateQuantityCart(res.totalProducts)
-               dispatch(action)
-               const actionCheck = checkCart(true)
-               dispatch(actionCheck)
+            let isNew = true
+
+            cartList.map(item => {
+               if(item.product._id == itemAdd._id && item.size == sizeAdd) {
+                  item.quantity += 1
+                  isNew = false
+               }
+            })
+            
+            if (isNew) {
+               cartList.push({
+                  product: itemAdd,
+                  size: sizeAdd,
+                  quantity: 1
+               })
             }
-            catch (err) {
-               setLoading(true)
-               message.error("Vui lòng chọn size giày !")
-            }
+
+            const action = addItemToCart(cartList)
+            dispatch(action)
+            message.success("Mua hàng thành công !")
+         } else {
+            message.error("Vui lòng chọn size giày !")
          }
-         buyProduct()
+         // async function buyProduct() {
+         //    try {
+         //       // const res = await cartApi.postCart(idUser._id, item._id, 1, size)
+         //       // message.success("Mua hàng thành công !")
+         //       // setLoading(true)
+
+         //       // const action = updateQuantityCart(res.totalProducts)
+         //       // dispatch(action)
+         //       // const actionCheck = checkCart(true)
+         //       // dispatch(actionCheck)
+         //    }
+         //    catch (err) {
+         //       setLoading(true)
+         //       message.error("Vui lòng chọn size giày !")
+         //    }
+         // }
+         // buyProduct()
       }
       else {
          message.warning("Vui lòng đăng nhập để mua sản phẩm !")
       }
+      setLoading(true)
    }
    const showImage = (img) => {
       let result = null

@@ -7,12 +7,18 @@ import { ProductData } from '../../action'
 import productApi from '../../api/productApi'
 import LoadingProduct from '../../components/Loading/lodingProduct'
 import './style.css'
+import showProduct from '../../components/Item'
+
+// understand backing 
+// in stock compete 
+// => udemy
 
 const ShowAllAndFilter = (props) => {
     // let nameURL = props.match.match.params.name
     const dispatch = useDispatch()
     const [slug, setSlug] = useState()
     const [totalProduct, setTotalProduct] = useState([])
+    const [totalProductRender, setTotalProductRender] = useState([])
     const [err, setErr] = useState()
     const [saleSearch, setSaleSearch] = useState({
         saleFirst: (0).toLocaleString('vi', { style: 'currency', currency: 'VND' }),
@@ -22,10 +28,12 @@ const ShowAllAndFilter = (props) => {
     const [filter, setfilter] = useState({
         slug: '',
         sort: '',
-        min: '',
-        max: '',
-        page: 1
+        min: 0,
+        max: 10000000,
     })
+
+    const [pageNum, setpageNum] = useState(1)
+
     useEffect(() => {
         setLoadWeb(true)
         window.scrollTo(0, 0)
@@ -35,6 +43,7 @@ const ShowAllAndFilter = (props) => {
                 setLoadWeb(false)
                 let result = res.saleProducts.concat(res.newProducts)
                 setTotalProduct(result)
+                setTotalProductRender(result)
                 setSlug(result.slice(0, 10))
             } catch (err) {
                 setLoadWeb(false)
@@ -48,22 +57,43 @@ const ShowAllAndFilter = (props) => {
         window.scrollTo(0, 0)
         async function filterProduct() {
             try {
-
-                setSlug(totalProduct.slice((filter.page-1) * 10, filter.page * 10))
+                console.log("filterProduct")
+                console.log(filter)
+                let resultFilter = []
+                totalProduct.forEach((value) => {
+                    if ( filter.min != '' && filter.max != '' && value.price >= filter.min && value.price <= filter.max) {
+                        resultFilter.push(value)
+                    }
+                }) 
+                setSlug(resultFilter.slice(0, 10))
+                setTotalProductRender(resultFilter)
             } catch (err) {
                 console.log(err);
             }
             setLoadWeb(false)
         }
-
-
        
         filterProduct()
     }, [filter])
 
+    useEffect(() => {
+        setLoadWeb(true)
+        window.scrollTo(0, 0)
+        async function filterProduct() {
+            try {
+                setSlug(totalProductRender.slice((pageNum-1) * 10, pageNum * 10))
+            } catch (err) {
+                console.log(err);
+            }
+            setLoadWeb(false)
+        }
+       
+        filterProduct()
+    }, [pageNum])
+
     const [flag, setFlag] = useState(true)
 
-    const Change = (e) => {
+    const SortPrice = (e) => {
         const { value } = e.target
         setfilter({
             ...filter,
@@ -142,15 +172,14 @@ const ShowAllAndFilter = (props) => {
     const onMenu = (setFlag, flag) => {
         setFlag(!flag)
     }
-    function onChangePage(newPage) {
-        setfilter({
-            ...filter,
-            page: newPage
-        })
+    function onChangePage(pageNum) {
+        setpageNum(pageNum)
     }
 
 
-    
+    // console.log("render")
+    // console.log(slug)
+    // console.log(totalProductRender)
     return (
         <div className="shop">
 
@@ -158,7 +187,7 @@ const ShowAllAndFilter = (props) => {
                 <div className="shop__header">
                     <div className="filter">
                         <div className="filter__left">
-                            <select onChange={(e) => Change(e)}
+                            <select onChange={(e) => SortPrice(e)}
                                 className="filter__left__select">
                                 <option value="sort">sắp xếp theo giá tiền</option>
                                 <option value="sort=price">giá tiền từ thấp đến cao</option>
@@ -166,7 +195,7 @@ const ShowAllAndFilter = (props) => {
                             </select>
                         </div>
                         <div className="filter__right">
-                            {slug ? <p>Hiển thị {slug.length} trên tổng số {totalProduct.length} kết quả</p> : <p>không có kết quả</p>}
+                            {slug ? <p>Hiển thị {slug.length} trên tổng số {totalProductRender.length} kết quả</p> : <p>không có kết quả</p>}
                             <div onClick={() => onMenu(setFlag, flag)} className="filter__search">
                                 <span>tìm kiếm</span>
                                 <MenuOutlined />
@@ -213,6 +242,7 @@ const ShowAllAndFilter = (props) => {
                             {loadWeb ? <LoadingProduct /> :
                                 showProductSlug(slug)
                             }
+                            {loadWeb ? <LoadingProduct /> : showProduct(slug, dispatch, false)}
                         </div>
                     </div>
                     :
@@ -228,8 +258,8 @@ const ShowAllAndFilter = (props) => {
                 }
                 <Pagination
                     defaultCurrent={1} 
-                    total={totalProduct.length} 
-                    current={filter.page}
+                    total={totalProductRender.length} 
+                    current={pageNum}
                      onChange={onChangePage}
                 />
             </div>
