@@ -4,20 +4,16 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { updateQuantityCart } from '../../action'
-import { cartTotal } from '../../action/cart'
+import { cartTotal, addItemToCart } from '../../action/cart'
 import cartApi from '../../api/cartApi'
 import './style.css'
 
 const Cart = () => {
     const [cartProduct, setCart] = useState({
         cart: [],
-        id: null,
-        sumProduct: 0,
-        result: "",
         totalPrice: 0
     })
     const [number, setNumber] = useState(false)
-    const [change, setChange] = useState(false)
     const dispatch = useDispatch()
     const useSelect = useSelector(state => state.user.list)
     const cartList = useSelector(state => state.cart.cartProductList)
@@ -26,141 +22,121 @@ const Cart = () => {
     const cartRefresh = useSelector(state => state.cart.checkCart)
 
     useEffect(() => {
-       setNumber(false)
-        async function renderCart() {
-            try {
-                const res = await cartApi.getCart()
-                let moneySum = Number(res.totalPrice);
-                moneySum = moneySum.toLocaleString('vi', { style: 'currency', currency: 'VND' })
-                setCart({
-                    cart: res.cart,
-                    id: res.id,
-                    sumProduct: moneySum,
-                    result: res.result,
-                    totalPrice: res.totalPrice
-                })
-            }
-            catch (err) {
-                console.log(err);
-            }
-        }
-        renderCart()
-        console.log("page cart")
-        console.log(cartList)
-    }, [change])
+        let totalPriceTmp = 0
+        cartList.forEach(element => {
+            totalPriceTmp += element.product.price * element.quantity
+        });
+        setCart({
+            cart: cartList,
+            totalPrice: totalPriceTmp
+        })
+     }, [])
 
-    const onDelete = (idProduct) => {
-        async function deleteProduct() {
-            try {
-                const res = await cartApi.deleteCart(idProduct)
+    const onDelete = (product_id, product_size, quantity) => {
 
-                let moneySum = Number(res.totalPrice);
-                moneySum = moneySum.toLocaleString('vi', { style: 'currency', currency: 'VND' })
-                setCart({
-                    cart: res.cartItems,
-                    id: res.id,
-                    sumProduct: moneySum,
-                    result: res.result,
-                    totalPrice: res.totalPrice
-                })
-                const action = updateQuantityCart(res)
-                dispatch(action)
-                const actionTotal = cartTotal(cartProduct)
-                dispatch(actionTotal)
-                message.success("Xóa sản phẩm thành công !")
+        let cartListTmp = []
+
+        let priceItemDelete = 0
+
+        cartProduct.cart.forEach(item => {
+                if(item.product._id == product_id && item.size == product_size) {
+                    message.success("Xóa sản phẩm thành công !")
+                    priceItemDelete = item.product.price
+                } else {
+                    cartListTmp.push(item)
+                }
             }
-            catch (err) {
-                console.log(err);
-                message.error("Xóa sản phẩm thất bại !")
-            }
-        }
-        deleteProduct()
+        )
+        setCart({
+            ...cartProduct,
+            cart: cartListTmp,
+            totalPrice: cartProduct.totalPrice - priceItemDelete * quantity
+        })
+        const action = addItemToCart(cartListTmp)
+        dispatch(action)
     }
 
-    const onMinus = (quantity, slug, size) => {
-        let flat = false
-        if (quantity > 1) {
-            quantity -= 1
-            flat = true
-        }
-        else {
-            message.warning("Sản phẩm tối thiểu là 1")
-        }
-        setNumber(true)
-        async function minusProduct() {
-            try {
-                await cartApi.updateQuantity(quantity, slug, size)
-                setNumber(false)
+    const onMinus = (product_id, product_size) => {
 
-                setChange(!change)
-                if (flat) {
-                    setNumber(true)
+        let cartListTmp = cartProduct.cart
+
+        cartListTmp.map(item => {
+            if(item.product._id == product_id && item.size == product_size) {
+                
+                if(item.quantity > 1 ){
+                    item.quantity -= 1
                     message.success("Giảm sản phẩm thành công")
+                    setCart({
+                        ...cartProduct,
+                        cart: cartListTmp,
+                        totalPrice: cartProduct.totalPrice - item.product.price
+                    })
+                    const action = addItemToCart(cartListTmp)
+                    dispatch(action)
+                } else {
+                    message.warning("Sản phẩm tối thiểu là 1")
                 }
             }
-            catch (err) {
-                console.log(err);
-            }
-        }
-        minusProduct()
+         })
     }
-    const onPlus = (quantity, slug, size) => {
-        let flat = false
-        if (quantity < 10) {
-            quantity += 1
-            flat = true
-        }
-        else {
-            message.warning("Sản phẩm tối đa là 10")
-        }
-        setNumber(true)
-        async function plusProduct() {
-            try {
-                await cartApi.updateQuantity(quantity, slug, size)
-                setNumber(false)
 
-                setChange(!change)
-                if (flat) {
+    const onPlus = (product_id, product_size) => {
+
+        let cartListTmp = cartProduct.cart
+
+        cartListTmp.map(item => {
+            if(item.product._id == product_id && item.size == product_size) {
+                
+                if(item.quantity < 10){
+                    item.quantity += 1
                     message.success("Tăng sản phẩm thành công")
+                    setCart({
+                        ...cartProduct,
+                        cart: cartListTmp,
+                        totalPrice: cartProduct.totalPrice + item.product.price
+                    })
+                    const action = addItemToCart(cartListTmp)
+                    dispatch(action)
+                } else {
+                    message.warning("Sản phẩm tối đa là 10")
                 }
             }
-            catch (err) {
-                console.log(err);
-            }
-        }
-        plusProduct()
+         })
     }
+
     const showCart = (cartProduct) => {
 
         let result = null
         result = cartProduct.map((value, index) => {
-            let money = Number(value.price);
+            console.log("showCart")
+            console.log(value)
+            let item = value.product
+            let money = Number(item.price * value.quantity);
             money = money.toLocaleString('vi', { style: 'currency', currency: 'VND' })
             return (
                 <div key={index} className="cart__list">
                     <div className="cart__item">
                         <div className="row pr">
                             <div className="col-xl-3 cart__img ">
-                                <img src={value.productImage.img} alt="" />
+                                <img src={item.productImage[0].img} alt="" />
                             </div>
                             <div className="col-xl-9 mr">
                                 <div className="row pr">
                                     <div className="col-xl-6 cart__icon--start">
-                                        <Link className="name--product" to="/">{value.title}</Link>
-                                        <p>Sale: {value.sale}%</p>
+                                        <Link className="name--product" to="/">{item.title}</Link>
                                         <p>Size: {value.size}</p>
                                     </div>
                                     <div className="col-xl-6 cart__icon--end">
                                         <div className="cart__quantity">
-                                            <button type="button" onClick={() => onMinus(value.qty, value.slug, value.size)} className={!number ? "cart__minus" :"cart__minus disable"} disabled={number}>-</button>
-                                            <span>{value.qty}</span>
-                                            <button onClick={() => onPlus(value.qty, value.slug, value.size)} className={!number ? "cart__plus" :"cart__plus disable"} disabled={number}>+</button>
+                                            <button type="button" onClick={() => onMinus(item._id, value.size)} className={!number ? "cart__minus" :"cart__minus disable"} disabled={number}>-</button>
+                                            <span>{value.quantity}</span>
+                                            <button onClick={() => onPlus(item._id, value.size)} className={!number ? "cart__plus" :"cart__plus disable"} disabled={number}>+</button>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="row pr">
                                     <div className="col-xl-6 cart__icon--start">
-                                        <div onClick={() => onDelete(value._id)} className="cart__remove">
+                                        <div onClick={() => onDelete(item._id, value.size, value.quantity)} className="cart__remove">
                                             <DeleteFilled />
                                             <span>Xóa</span>
                                         </div>
@@ -201,7 +177,7 @@ const Cart = () => {
                         <div className="row cart__top">
                             <div className="col-xl-8 col-lg-8 mr">
                                 <div className="cart__content">
-                                    <h2 className="cart__title">Giỏ Hàng ( {cartProduct.result} sản phẩm )</h2>
+                                    <h2 className="cart__title">Giỏ Hàng ( {cartProduct.cart.length} sản phẩm )</h2>
                                     {showCart(cartProduct.cart)}
 
                                 </div>
@@ -211,7 +187,7 @@ const Cart = () => {
                                     <h2 className="cart__total--title">Cộng giỏ hàng</h2>
                                     <div className="cart__amuont">
                                         <span className="cart__amount--title">Tạm tính</span>
-                                        <span className="cart__amount--price">{cartProduct.sumProduct}</span>
+                                        <span className="cart__amount--price">{cartProduct.totalPrice}</span>
                                     </div>
                                     <div className="cart__amuont">
                                         <span className="cart__amount--title">Phí ship</span>
