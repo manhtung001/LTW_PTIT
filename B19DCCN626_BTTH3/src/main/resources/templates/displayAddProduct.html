@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Product Maintenance</title>
+    </head>
+    <body>
+        <h1>Add Product</h1>
+          <td th:text="${messageErrorEmpty}"></td>
+            <form method="POST" th:action= "@{'/product/addProduct'}" th:object="${product}"> 
+		      	  <label >Code: </label>
+			      <input type="text" th:field="*{productCode}"/><br/>
+			      
+			      <label>Description: </label>
+			      <input type="text" th:field="*{productDescription}"/><br/>
+			      
+			      <label>Price: </label>
+			      <input type="text"th:field="*{productPrice}"/><br/>
+		      
+		      <input type="submit" value="Add Product"/>
+    		</form>
+            
+            <a href="../../displayProducts">
+        		View Products
+    		</a>
+        
+    </body>
+</html>

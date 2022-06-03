@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Product Maintenance</title>
+    </head>
+    <body>
+        <h1>Products</h1>
+            <table border="1" cellspacing="2">
+                <tr>
+                    <td>Code</td>
+                    <td>Description</td>
+                    <td>Price</td>
+                </tr>
+                
+                <tr th:each="product : ${listproduct}">
+                	<td th:text="${product.getProductCode()}"></td>
+                	<td th:text="${product.getProductDescription()}"></td>
+                	<td th:text="${product.getProductPrice()}"></td>
+			        <td><a th:href="@{'/product/editProduct/' + ${product.productCode}}">EDIT</a></td>
+                  	<td><a th:href="@{'/product/deleteProductPage/' + ${product.productCode}}">DELETE</a></td> 
+    			</tr>
+       
+            </table>
+            <a href="product/addProductPage">Add Product</a>  
+        
+    </body>
+</html>
+
+
+

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Product Maintenance</title>
+    </head>
+    <body>
+    
+    <h1><b>Are You Sure You Want To Delete This Product?</b></h1>
+    
+    <span>Code: </span> <span th:text="${productFinded.getProductCode()}"></span><br/>
+    <span>Description: </span> <span th:text="${productFinded.getProductDescription()}"></span><br/>
+    <span>Price: </span> <span th:text="${productFinded.getProductPrice()}"></span><br/>
+    
+    
+    <form method="POST" th:action= "@{'/product/deleteProduct'}" th:object="${productFinded}"> 
+    			  <input type="hidden" th:field="*{productCode}"/><br/>
+			      <input type="hidden" th:field="*{productDescription}"/><br/>
+			      <input type="hidden"th:field="*{productPrice}"/><br/>
+		          <input type="submit" value="Yes"/>
+    		</form>
+    	
+        <br/>
+        <a href="../../displayProducts">
+        		No
+    		</a>
+
+    </body>
+</html>
