@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+>
+	<head>
+		<title>Student Maintance</title>
+	</head>
+	<body>
+		<h1>Student</h1>
+		
+		<table border="1" cellspacing="2">
+			<tr>
+				<td>id</td>
+				<td>name</td>
+				<td>dob</td>
+				<td>department</td>
+				<td>approved</td>
+			</tr>
+			
+			<tr th:each="student :${listStudent}">
+				<td th:text="${student.getId()}"></td>
+				<td th:text="${student.getName()}"></td>
+				<td th:text="${student.getDob()}"></td>
+				<td th:text="${student.getDepartment()}"></td>
+				<td th:text="${student.getApproved()}"></td>
+				
+				<td><a th:href="@{'/student/updateStudentPage/' + ${student.getId()}}">EDIT</a></td>
+				<td><a th:href="@{'/student/deleteStudentPage/' + ${student.getId()}}">DELETE</a></td>
+			</tr>
+		
+		</table>
+		
+		
+		<a href="/student/addStudentPage">add student</a>
+	</body>
+</html>

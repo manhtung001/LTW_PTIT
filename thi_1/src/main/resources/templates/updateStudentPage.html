@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+>
+	<head>
+		<title>Student Maintance</title>
+	</head>
+	<body>
+		<h1>Update Student</h1>
+		
+		
+		
+		<form method="POST" th:action="@{'/student/updateStudent'}" th:object="${studentRawFinded}">
+		
+			<span>Id: </span><input disabled type="text" th:field="*{id}" /> <br/>
+			<span>Name: </span><input type="text" th:field="*{name}" /> <br/>
+			<span th:text="${messageErrorName}"></span> <br/>
+			<span>Dob: </span><input type="text" th:field="*{dob}" /> <br/>
+			<span th:text="${messageErrorDob}"></span> <br/>
+			<select th:field="*{department}">
+			    <option th:value="'cntt'" th:text="cntt"></option>
+			    <option th:value="'y'" th:text="y"></option>
+			</select>
+			<br/>
+			<input  type="hidden" th:field="*{id}" /> <br/>
+			<input type="hidden" th:field="*{approved}" /> 
+			
+			<input type="submit" value="update" />
+		</form>
+		
+		
+		<a href="../../../">view students</a>
+	</body>
+</html>

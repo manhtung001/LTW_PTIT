@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+>
+	<head>
+		<title>Student Maintance</title>
+	</head>
+	<body>
+		<h1>add confirm Student</h1>
+		
+		<span>Do you want to add this?</span> <br/>
+		<span>id: </span> <span th:text="${studentRaw.id}"></span> <br/>
+		<span>name: </span> <span th:text="${studentRaw.name}"></span> <br/>
+		<span>dob: </span> <span th:text="${studentRaw.dob}"></span> <br/>
+		<span>department: </span> <span th:text="${studentRaw.department}"></span> <br/>
+		
+		<form method="POST" th:action="@{'/student/addStudent'}" th:object="${studentRaw}">
+		
+			<input type="hidden" th:field="*{id}" />
+			<input type="hidden" th:field="*{name}" />
+			<input type="hidden" th:field="*{dob}" />
+			<input type="hidden" th:field="*{department}" />
+			<input type="hidden" th:field="*{approved}" />
+			
+			<input type="submit" value="yes" />
+		
+		</form>
+		
+		
+		<a href="/student/addStudentPage">Back</a>
+	</body>
+</html>
