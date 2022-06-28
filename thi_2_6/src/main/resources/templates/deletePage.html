@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+	<body>
+	
+		<span>do you want delete this?</span><br/>
+		
+		<span>id: </span><span th:text="${StudentFind.id}"></span><br/>
+		<span>name: </span><span th:text="${StudentFind.name}"></span><br/>
+		<span>dob: </span><span th:text="${StudentFind.dob}"></span><br/>
+		<span>department: </span><span th:text="${StudentFind.department}"></span><br/>
+		<span>approved: </span><span th:text="${StudentFind.approved}"></span><br/>
+		
+		<a th:href="@{'/student/delete/' + ${StudentFind.id}}">yes</a>
+		<br/>
+		<a th:href="@{'/student/displayStudent'}">no</a>
+		
+	</body>
+</html>

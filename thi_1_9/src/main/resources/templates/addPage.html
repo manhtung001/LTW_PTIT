@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+	<body>
+		<form method="POST" th:action="@{'/addConfirm'}" th:object="${studentRaw}">
+			<span>id: </span><input type="text" th:field="*{id}" />
+			<span th:text="${errId}"></span>
+			<br/>
+			<span>name: </span><input type="text" th:field="*{name}" />
+			<span th:text="${errName}"></span>
+			<br/>
+			<span>dob: </span><input type="text" th:field="*{dob}" />
+			<span th:text="${errDob}"></span>
+			<br/>
+			<span>department: </span>
+			<select th:field="*{department}" />
+				<option th:selected="${session.isEmpty()} ? true : ${#session.getAttribute('departmentSession')=='cntt'}" th:value="'cntt'" th:text="'cntt'"></option>
+				<option th:selected="${session.isEmpty()} ? false : ${#session.getAttribute('departmentSession')=='y'}" th:value="'y'" th:text="'y'"></option>
+			</select>
+			<br/>
+			
+			<input type="hidden" th:field="*{approved}" />
+			
+			<input type="submit" value="add"/>
+			<input type="reset" />
+			
+		</form>
+	</body>
+</html>
